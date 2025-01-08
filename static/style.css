@@ -1,0 +1,99 @@
+body {
+    text-align: center; 
+    font-family: 'Montserrat', 'Arial', sans-serif;
+    background-color: #0e0320;
+    margin: 0;
+    padding: 20px;
+    color: #a89e95;
+}
+
+h1 {
+    text-align: center; 
+    color: #6e2dde;
+    transform: scaleY(1);
+    display: inline-block;
+    font-weight: 400;
+    letter-spacing: 1px;
+    margin-bottom: 20px;
+    text-transform: uppercase;
+    text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.4);
+    font-size: 32px;
+}
+
+.search-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+input[type="text"] {
+    width: 50%; /* Adjust width for better alignment */
+    padding: 12px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.2);
+    font-size: 16px;
+}
+
+button {
+    padding: 12px 24px;
+    margin-left: 10px; /* Adds space between the input and the button */
+    background-color: #6e2dde;
+    border: none;
+    border-radius: 6px;
+    color: #d7cbcb;
+    cursor: pointer;
+    box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.2);
+    font-size: 16px;
+    transition: background-color 0.3s;
+}
+
+button:hover {
+    background-color: #3b1973;
+}
+
+#results {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 25px;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+#results div {
+    background-color: #1a1a1a;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    padding: 15px;
+    width: 100%;
+    text-align: center;
+    transition: transform 0.3s;
+}
+
+#results img {
+    max-width: 100%;
+    border-radius: 6px;
+    margin-bottom: 10px;
+    cursor: pointer;
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+#results img:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+#results h3 {
+    font-size: 18px;
+    color: #d7cbcb;
+    margin: 10px 0;
+    font-weight: 500;
+}
+
+#player {
+    margin-top: 20px;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}

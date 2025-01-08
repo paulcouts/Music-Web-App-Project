@@ -1,0 +1,46 @@
+    <!DOCTYPE html>
+<html>
+<head>
+    <title>YouTube IFrame API Demo</title>
+</head>
+<body>
+    <!-- 1. Div that will be replaced by the IFrame API -->
+    <div id="player"></div>
+
+    <script>
+        var tag = document.createElement('script');
+        tag.src = "https://www.youtube.com/iframe_api";
+        var firstScriptTag = document.getElementsByTagName('script')[0];
+        firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+    
+        var player;
+        function onYouTubeIframeAPIReady() {
+            var videoId = '{{ video_id }}'; // Video ID passed from Flask
+            player = new YT.Player('player', {
+                height: '390',
+                width: '640',
+                videoId: videoId,
+                playerVars: {
+                    'autoplay': 1,
+                    'controls': 1
+                },
+                events: {
+                    'onReady': onPlayerReady,
+                    'onStateChange': onPlayerStateChange
+                }
+            });
+        }
+    
+        function onPlayerReady(event) {
+            event.target.playVideo();
+        }
+    
+        function onPlayerStateChange(event) {
+            if (event.data == YT.PlayerState.ENDED) {
+                console.log('Video ended');
+            }
+        }
+    </script>
+    
+</body>
+</html>
