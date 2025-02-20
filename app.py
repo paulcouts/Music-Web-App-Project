@@ -9,8 +9,7 @@ def index():
 @app.route('/search', methods=['POST'])
 def search_videos():
     query = request.form.get('query')
-    # You'd need to integrate your logic for fetching video data here.
-    # For now, let's mock a response:
+
     results = [
         {'title': 'Video 1', 'thumbnail': 'thumbnail1.jpg', 'videoId': 'video1'},
         {'title': 'Video 2', 'thumbnail': 'thumbnail2.jpg', 'videoId': 'video2'}
