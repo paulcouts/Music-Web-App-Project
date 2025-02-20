@@ -1,25 +1,22 @@
+/* Base styling inspired by iOS */
 body {
-    text-align: center; 
-    font-family: 'Montserrat', 'Arial', sans-serif;
-    background-color: #0e0320;
     margin: 0;
     padding: 20px;
-    color: #a89e95;
+    background-color: #fff;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    color: #333;
+    text-align: center;
 }
 
+/* Headings */
 h1 {
-    text-align: center; 
-    color: #6e2dde;
-    transform: scaleY(1);
-    display: inline-block;
-    font-weight: 400;
-    letter-spacing: 1px;
+    font-size: 28px;
+    font-weight: 600;
+    color: #000;
     margin-bottom: 20px;
-    text-transform: uppercase;
-    text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.4);
-    font-size: 32px;
 }
 
+/* Container for search area */
 .search-container {
     display: flex;
     justify-content: center;
@@ -27,73 +24,116 @@ h1 {
     margin-bottom: 20px;
 }
 
+/* Text input styled like iOS search bar */
 input[type="text"] {
-    width: 50%; /* Adjust width for better alignment */
-    padding: 12px;
+    width: 60%;
+    padding: 10px 14px;
     border: 1px solid #ccc;
-    border-radius: 6px;
-    box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.2);
+    border-radius: 10px;
     font-size: 16px;
+    outline: none;
+    transition: border 0.3s;
 }
 
+input[type="text"]:focus {
+    border-color: #007aff;
+}
+
+/* Button styling with iOS blue */
 button {
-    padding: 12px 24px;
-    margin-left: 10px; /* Adds space between the input and the button */
-    background-color: #6e2dde;
+    padding: 10px 20px;
+    margin-left: 10px;
+    background-color: #007aff;
+    color: #fff;
     border: none;
-    border-radius: 6px;
-    color: #d7cbcb;
-    cursor: pointer;
-    box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.2);
+    border-radius: 10px;
     font-size: 16px;
-    transition: background-color 0.3s;
+    cursor: pointer;
+    transition: background-color 0.3s, box-shadow 0.3s;
 }
 
 button:hover {
-    background-color: #3b1973;
+    background-color: #005bb5;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
 }
 
+/* Search results container */
 #results {
     display: flex;
     flex-wrap: wrap;
-    gap: 25px;
+    gap: 20px;
     justify-content: center;
     margin-top: 20px;
 }
 
+/* Each search result box */
 #results div {
-    background-color: #1a1a1a;
-    border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    background-color: #f9f9f9;
+    border-radius: 12px;
     padding: 15px;
-    width: 100%;
+    width: 90%;
+    max-width: 300px;
     text-align: center;
+    transition: transform 0.3s, box-shadow 0.3s;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+#results div:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* Images within results */
+#results img {
+    width: 100%;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    cursor: pointer;
     transition: transform 0.3s;
 }
 
-#results img {
-    max-width: 100%;
-    border-radius: 6px;
-    margin-bottom: 10px;
-    cursor: pointer;
-    transition: transform 0.3s, box-shadow 0.3s;
-}
-
 #results img:hover {
-    transform: scale(1.05);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    transform: scale(1.03);
 }
 
+/* Headings within results */
 #results h3 {
     font-size: 18px;
-    color: #d7cbcb;
     margin: 10px 0;
+    color: #333;
     font-weight: 500;
 }
 
+/* Player container (if applicable) */
 #player {
     margin-top: 20px;
-    border-radius: 8px;
+    border-radius: 12px;
     overflow: hidden;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 1px 5px rgba(0, 0, 0, 0.15);
+}
+
+/* iOS-style bottom player bar */
+.player-bar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background-color: #f9f9f9;
+    border-top: 1px solid #ccc;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    padding: 0 10px;
+    font-size: 16px;
+    color: #333;
+}
+
+/* Hidden video (for YouTube playback) */
+#hidden-video {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    opacity: 0;
+    pointer-events: none;
 }

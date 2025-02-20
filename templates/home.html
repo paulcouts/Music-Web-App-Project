@@ -4,41 +4,102 @@
   <title>Music App</title>
   <!-- Link to your CSS in the static folder -->
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-
   <style>
-    /* iOS-like overall look */
+    /* iOS-inspired styles */
     body {
       margin: 0;
       padding: 0;
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-      background-color: #f2f2f2;
-      color: #333;
+      background-color: #1a1a1a;
+      color: #fff;
     }
-
-    /* Top navigation bar for search */
     .top-nav {
       display: flex;
       align-items: center;
       justify-content: center;
-      background-color: #ffffff;
+      background-color: #2c2c2c;
       padding: 10px 15px;
-      border-bottom: 1px solid #ccc;
+      border-bottom: 1px solid #333;
       position: sticky;
       top: 0;
       z-index: 10;
     }
-
     .top-nav input[type="text"] {
       flex: 1;
       max-width: 600px;
-      padding: 8px 10px;
+      padding: 10px;
       margin-right: 10px;
       font-size: 16px;
-      border: 1px solid #ccc;
+      border: none;
       border-radius: 8px;
     }
-
     .top-nav button {
+      background-color: #007aff;
+      border: none;
+      color: #fff;
+      padding: 10px 20px;
+      font-size: 16px;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    .home-container, #searchResults {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin: 20px auto;
+      gap: 20px;
+      max-width: 1000px;
+      padding: 0 20px;
+    }
+    .home-box, .search-box {
+      background-color: #2c2c2c;
+      width: 30%;
+      max-width: 200px;
+      border-radius: 10px;
+      overflow: hidden;
+      text-align: center;
+      cursor: pointer;
+      transition: transform 0.3s;
+    }
+    .home-box:hover, .search-box:hover {
+      transform: scale(1.05);
+    }
+    .home-box img, .search-box img {
+      width: 100%;
+      display: block;
+    }
+    .box-info, .search-box h3 {
+      padding: 10px;
+    }
+    .box-info h3 {
+      font-size: 16px;
+      margin: 5px 0;
+      color: #fff;
+    }
+    .player-bar {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background-color: #2c2c2c;
+      border-top: 1px solid #333;
+      height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: space-around;
+      padding: 0 10px;
+      color: #fff;
+      z-index: 999;
+    }
+    #hidden-video {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      opacity: 0;
+      pointer-events: none;
+    }
+    /* Back button for search results */
+    #backBtn {
       background-color: #007aff;
       border: none;
       color: #fff;
@@ -46,160 +107,99 @@
       font-size: 16px;
       border-radius: 8px;
       cursor: pointer;
-    }
-
-    /* Container for recommended boxes */
-    .home-container {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      margin: 80px 0; /* space for the top and bottom bars */
-      padding: 10px;
-      gap: 10px;
-    }
-
-    /* Each box for recommended songs/categories */
-    .home-box {
-      background-color: #fff;
-      width: calc(33% - 20px);
-      max-width: 200px;
-      border-radius: 10px;
-      overflow: hidden;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-      text-align: center;
-      cursor: pointer;
-    }
-
-    .home-box img {
-      width: 100%;
+      margin: 20px auto;
       display: block;
     }
-
-    .home-box .box-info {
-      padding: 10px;
-    }
-    
-    .home-box .box-info h3 {
-      font-size: 16px;
-      margin: 5px 0;
-    }
-
-    /* Player bar at bottom of screen */
-    .player-bar {
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      background-color: #fff;
-      border-top: 1px solid #ccc;
-      height: 60px;
-      display: flex;
-      align-items: center;
-      justify-content: space-around;
-      padding: 0 10px;
-      z-index: 999;
-    }
-
-    /* Hide the actual video visually but allow YouTube controls to persist */
-    #hidden-video {
-      position: absolute;
-      width: 1px; 
-      height: 1px; 
-      opacity: 0;
-      pointer-events: none;
-    }
   </style>
-
 </head>
 <body>
 
-  <!-- Top nav with search -->
+  <!-- Top navigation bar with search -->
   <div class="top-nav">
-    <input type="text" id="searchInput" placeholder="Search songs or artists..." />
+    <input type="text" id="searchInput" placeholder="Search songs or artists...">
     <button onclick="searchVideos()">Search</button>
   </div>
 
-  <!-- Home screen with recommended songs/categories -->
-  <div class="home-container">
-    <!-- Example: 6 boxes for recommended items -->
-    <div class="home-box" onclick="playSong('VIDEO_ID_1', 'Song Title 1')">
-      <img src="https://via.placeholder.com/300?text=Thumb1" alt="Thumb1">
+  <!-- Home view: Recommended videos -->
+  <div class="home-container" id="homeContainer">
+    <!-- Six video boxes -->
+    <div class="home-box" onclick="playSong('dQw4w9WgXcQ', 'Never Gonna Give You Up')">
+      <img src="https://img.youtube.com/vi/dQw4w9WgXcQ/0.jpg" alt="Never Gonna Give You Up">
       <div class="box-info">
-        <h3>Song Title 1</h3>
-        <p>Artist Name</p>
+        <h3>Never Gonna Give You Up</h3>
+        <p>Rick Astley</p>
       </div>
     </div>
-
-    <div class="home-box" onclick="playSong('VIDEO_ID_2', 'Song Title 2')">
-      <img src="https://via.placeholder.com/300?text=Thumb2" alt="Thumb2">
+    <div class="home-box" onclick="playSong('FTQbiNvZqaY', 'Africa')">
+      <img src="https://img.youtube.com/vi/FTQbiNvZqaY/0.jpg" alt="Africa">
       <div class="box-info">
-        <h3>Song Title 2</h3>
-        <p>Artist Name</p>
+        <h3>Africa</h3>
+        <p>Toto</p>
       </div>
     </div>
-
-    <div class="home-box" onclick="playSong('VIDEO_ID_3', 'Song Title 3')">
-      <img src="https://via.placeholder.com/300?text=Thumb3" alt="Thumb3">
+    <div class="home-box" onclick="playSong('djV11Xbc914', 'Take On Me')">
+      <img src="https://img.youtube.com/vi/djV11Xbc914/0.jpg" alt="Take On Me">
       <div class="box-info">
-        <h3>Song Title 3</h3>
-        <p>Artist Name</p>
+        <h3>Take On Me</h3>
+        <p>a-ha</p>
       </div>
     </div>
-
-    <div class="home-box" onclick="playSong('VIDEO_ID_4', 'Song Title 4')">
-      <img src="https://via.placeholder.com/300?text=Thumb4" alt="Thumb4">
+    <div class="home-box" onclick="playSong('Zi_XLOBDo_Y', 'Billie Jean')">
+      <img src="https://img.youtube.com/vi/Zi_XLOBDo_Y/0.jpg" alt="Billie Jean">
       <div class="box-info">
-        <h3>Song Title 4</h3>
-        <p>Artist Name</p>
+        <h3>Billie Jean</h3>
+        <p>Michael Jackson</p>
       </div>
     </div>
-
-    <div class="home-box" onclick="playSong('VIDEO_ID_5', 'Song Title 5')">
-      <img src="https://via.placeholder.com/300?text=Thumb5" alt="Thumb5">
+    <div class="home-box" onclick="playSong('JGwWNGJdvx8', 'Shape of You')">
+      <img src="https://img.youtube.com/vi/JGwWNGJdvx8/0.jpg" alt="Shape of You">
       <div class="box-info">
-        <h3>Song Title 5</h3>
-        <p>Artist Name</p>
+        <h3>Shape of You</h3>
+        <p>Ed Sheeran</p>
       </div>
     </div>
-
-    <div class="home-box" onclick="playSong('VIDEO_ID_6', 'Song Title 6')">
-      <img src="https://via.placeholder.com/300?text=Thumb6" alt="Thumb6">
+    <div class="home-box" onclick="playSong('OPf0YbXqDm0', 'Uptown Funk')">
+      <img src="https://img.youtube.com/vi/OPf0YbXqDm0/0.jpg" alt="Uptown Funk">
       <div class="box-info">
-        <h3>Song Title 6</h3>
-        <p>Artist Name</p>
+        <h3>Uptown Funk</h3>
+        <p>Bruno Mars</p>
       </div>
     </div>
   </div>
 
-  <!-- Hidden video to let YouTube stream audio -->
+  <!-- Search results view (initially hidden) -->
+  <div id="searchResults" style="display:none;"></div>
+
+  <!-- Hidden YouTube player (audio only) -->
   <div id="hidden-video"></div>
 
   <!-- Bottom player bar -->
   <div class="player-bar">
     <div id="songTitle">Not playing</div>
-    <!-- A simple progress bar (update via YouTube API if desired) -->
     <input type="range" id="progressBar" value="0" min="0" max="100" style="width: 40%;">
     <button onclick="togglePlayPause()">Play/Pause</button>
   </div>
 
-  <!-- Load YouTube IFrame API and define functions -->
+  <!-- JavaScript -->
   <script>
     let player;
     let isPlaying = false;
+    let progressTimer = null;
 
+    // Load YouTube IFrame API
     function loadYouTubeAPI() {
-      let tag = document.createElement('script');
+      const tag = document.createElement('script');
       tag.src = "https://www.youtube.com/iframe_api";
-      let firstScriptTag = document.getElementsByTagName('script')[0];
+      const firstScriptTag = document.getElementsByTagName('script')[0];
       firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
     }
 
     window.onYouTubeIframeAPIReady = function() {
-      // Create the player in the hidden div
+      console.log("YouTube API is ready");
       player = new YT.Player('hidden-video', {
         height: '90',
         width: '160',
-        videoId: '',
+        videoId: '', // No video loaded initially
         playerVars: {
           controls: 1,
           autoplay: 0,
@@ -208,58 +208,115 @@
           rel: 0
         },
         events: {
+          'onReady': onPlayerReady,
           'onStateChange': onPlayerStateChange
         }
       });
     };
 
+    function onPlayerReady(event) {
+      console.log("Player ready");
+    }
+
     function onPlayerStateChange(event) {
-      if(event.data === YT.PlayerState.ENDED) {
-        console.log('Song ended');
+      if (event.data === YT.PlayerState.PLAYING) {
+        console.log("Video is playing");
+        isPlaying = true;
+        if (progressTimer) clearInterval(progressTimer);
+        progressTimer = setInterval(updateProgressBar, 1000);
+      } else {
+        isPlaying = false;
+        if (progressTimer) clearInterval(progressTimer);
+      }
+      if (event.data === YT.PlayerState.ENDED) {
+        console.log("Video ended");
+        document.getElementById('progressBar').value = 0;
       }
     }
 
-    // Function to play a song from a recommended box
+    function updateProgressBar() {
+      if (player && player.getCurrentTime && player.getDuration) {
+        const currentTime = player.getCurrentTime();
+        const duration = player.getDuration();
+        if (duration > 0) {
+          const progressPercent = (currentTime / duration) * 100;
+          document.getElementById('progressBar').value = progressPercent;
+        }
+      }
+    }
+
+    // Modified playSong: add logging and force playback after loading
     function playSong(videoId, title) {
-      if(player) {
+      if (player && typeof player.loadVideoById === 'function') {
+        console.log("Loading video:", videoId);
         player.loadVideoById(videoId);
+        // Force playback after a short delay to ensure the video loads
+        setTimeout(() => {
+          player.playVideo();
+        }, 500);
         document.getElementById('songTitle').textContent = title;
-        isPlaying = true;
+        document.getElementById('progressBar').value = 0;
+      } else {
+        console.log("Player not ready.");
       }
     }
 
     function togglePlayPause() {
-      if(!player) return;
-      if(isPlaying) {
+      if (!player) return;
+      if (isPlaying) {
         player.pauseVideo();
-        isPlaying = false;
       } else {
         player.playVideo();
-        isPlaying = true;
       }
     }
 
+    // Search videos and replace home view with results
     async function searchVideos() {
       const query = document.getElementById('searchInput').value.trim();
-      if(!query) return;
-
+      if (!query) return;
       try {
         const response = await fetch('/search', {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/x-www-form-urlencoded'
-          },
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
           body: 'query=' + encodeURIComponent(query)
         });
         const data = await response.json();
-        console.log(data);
-        // Optionally update the UI with search results.
+        console.log("Search results:", data);
+        // Hide home view and show search results
+        document.getElementById('homeContainer').style.display = 'none';
+        const resultsContainer = document.getElementById('searchResults');
+        resultsContainer.style.display = 'flex';
+        resultsContainer.innerHTML = '';
+        // Add Back to Home button
+        const backBtn = document.createElement('button');
+        backBtn.id = 'backBtn';
+        backBtn.textContent = 'Back to Home';
+        backBtn.onclick = showHome;
+        resultsContainer.appendChild(backBtn);
+        // Render each search result
+        data.forEach(video => {
+          const box = document.createElement('div');
+          box.classList.add('search-box');
+          box.innerHTML = `
+            <img src="${video.thumbnail}" alt="${video.title}" onclick="playSong('${video.videoId}', '${video.title}')" />
+            <h3>${video.title}</h3>
+          `;
+          resultsContainer.appendChild(box);
+        });
       } catch (err) {
         console.error(err);
       }
     }
 
-    // Load the YouTube API on page load.
+    // Show home view again and clear search results
+    function showHome() {
+      document.getElementById('homeContainer').style.display = 'flex';
+      const resultsContainer = document.getElementById('searchResults');
+      resultsContainer.style.display = 'none';
+      resultsContainer.innerHTML = '';
+      document.getElementById('searchInput').value = '';
+    }
+
     loadYouTubeAPI();
   </script>
 </body>
