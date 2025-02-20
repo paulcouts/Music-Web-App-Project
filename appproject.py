@@ -1,21 +1,18 @@
 from flask import Flask, render_template, request, jsonify
 from flask_cors import CORS
 from decouple import config
-
+from googleapiclient.discovery import build
 
 app = Flask(__name__)
 CORS(app)
-from googleapiclient.discovery import build
-import os
 
-app = Flask(__name__)
 
 YOUTUBE_API_KEY = config('API_KEY')
 youtube = build('youtube', 'v3', developerKey=YOUTUBE_API_KEY)
 
 @app.route('/')
 def index():
-    return render_template('search.html')
+    return render_template('home.html')
 
 @app.route('/search', methods=['POST'])
 def search():
