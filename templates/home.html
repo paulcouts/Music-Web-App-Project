@@ -3,12 +3,6 @@
 <head>
   <title>Music App</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-  <!-- Use Goudy Old Style Bold if installed on the system -->
-  <style>
-    body {
-      font-family: "Goudy Old Style Bold", "Goudy Old Style", serif;
-    }
-  </style>
 </head>
 <body>
   <!-- Top Navigation Bar -->
@@ -30,7 +24,7 @@
     </div>
   </header>
 
-  <!-- Player Area -->
+  <!-- Visible YouTube Player -->
   <div id="playerContainer">
     <div id="player">
       <p>Select a video to play</p>
@@ -38,21 +32,188 @@
     <div id="songTitle">Not playing</div>
   </div>
 
-  <!-- Home View: Recommended Videos -->
-  <div class="home-container" id="homeContainer">
-    <!-- Boxes injected dynamically -->
+  <!-- Control Panel -->
+  <div id="control-panel">
+    <div id="progressContainer">
+      <input type="range" id="progressBar" min="0" max="100" value="0">
+    </div>
+    <div id="controls">
+      <button id="rewindBtn" onclick="rewind()">&#x23EE; 10s</button>
+      <button id="playPauseBtn" onclick="togglePlayPause()">Play</button>
+      <button id="fastForwardBtn" onclick="fastForward()">10s &#x23ED;</button>
+      <button id="nextBtn" onclick="nextSong()">Next</button>
+    </div>
+    <div id="queueDisplay">
+      <h3>Queue</h3>
+      <ul id="queueList"></ul>
+    </div>
   </div>
 
-  <!-- Search Results (initially hidden) -->
-  <div id="searchResults" style="display: none;"></div>
+  <!-- Content Area: Recommended Videos and Search Results -->
+  <div id="contentArea">
+    <div class="home-container" id="homeContainer">
+      <!-- Recommended videos will be injected here -->
+    </div>
+    <div id="searchResults" style="display: none;">
+      <!-- Search results will be injected here -->
+    </div>
+  </div>
+
+  <!-- Load YouTube IFrame API -->
+  <script>
+    var tag = document.createElement('script');
+    tag.src = "https://www.youtube.com/iframe_api";
+    var firstScriptTag = document.getElementsByTagName('script')[0];
+    firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+  </script>
 
   <script>
-    // Load recommended videos with the default query "music"
+    // Global variables
+    let player; // YouTube player instance in visible container
+    let playerReady = false;
+    let progressTimer = null;
+    let queue = []; // Array of { videoId, title }
+
+    // When YouTube API is ready, create the player in the "player" container.
+    function onYouTubeIframeAPIReady() {
+      player = new YT.Player('player', {
+        height: '390',
+        width: '640',
+        videoId: '', // No video loaded initially
+        playerVars: {
+          autoplay: 0,
+          controls: 1,
+          rel: 0,
+          enablejsapi: 1,
+          playsinline: 1
+        },
+        events: {
+          'onReady': onPlayerReady,
+          'onStateChange': onPlayerStateChange
+        }
+      });
+    }
+
+    function onPlayerReady(event) {
+      playerReady = true;
+      console.log("Player ready");
+      progressTimer = setInterval(updateProgressBar, 1000);
+    }
+
+    // When video ends, play the next in the queue.
+    function onPlayerStateChange(event) {
+      if (event.data === YT.PlayerState.ENDED) {
+        nextSong();
+      }
+      // Update Play/Pause button text.
+      if (event.data === YT.PlayerState.PLAYING) {
+        document.getElementById('playPauseBtn').textContent = "Pause";
+      } else if (event.data === YT.PlayerState.PAUSED) {
+        document.getElementById('playPauseBtn').textContent = "Play";
+      }
+    }
+
+    // Play a video immediately.
+    function playSong(videoId, title) {
+      if (!playerReady) {
+        console.log("Player not ready");
+        return;
+      }
+      document.getElementById('progressBar').value = 0;
+      player.loadVideoById(videoId);
+      document.getElementById('songTitle').textContent = title;
+    }
+
+    // Add a video to the queue.
+    function addToQueue(videoId, title) {
+      queue.push({ videoId, title });
+      updateQueueDisplay();
+    }
+
+    // Play the next video in the queue.
+    function nextSong() {
+      if (queue.length > 0) {
+        const next = queue.shift();
+        updateQueueDisplay();
+        playSong(next.videoId, next.title);
+      } else {
+        player.stopVideo();
+        document.getElementById('songTitle').textContent = "Not playing";
+      }
+    }
+
+    // Update the queue display.
+    function updateQueueDisplay() {
+      const list = document.getElementById('queueList');
+      list.innerHTML = "";
+      queue.forEach((item, index) => {
+        const li = document.createElement('li');
+        li.textContent = item.title;
+        const removeBtn = document.createElement('button');
+        removeBtn.textContent = "Remove";
+        removeBtn.onclick = (e) => {
+          e.stopPropagation();
+          queue.splice(index, 1);
+          updateQueueDisplay();
+        };
+        li.appendChild(removeBtn);
+        list.appendChild(li);
+      });
+    }
+
+    // Toggle play/pause.
+    function togglePlayPause() {
+      if (!playerReady) return;
+      const state = player.getPlayerState();
+      if (state === YT.PlayerState.PLAYING) {
+        player.pauseVideo();
+      } else {
+        player.playVideo();
+      }
+    }
+
+    // Rewind 10 seconds.
+    function rewind() {
+      if (!playerReady) return;
+      const current = player.getCurrentTime();
+      player.seekTo(Math.max(current - 10, 0), true);
+    }
+
+    // Fast forward 10 seconds.
+    function fastForward() {
+      if (!playerReady) return;
+      const current = player.getCurrentTime();
+      const duration = player.getDuration();
+      player.seekTo(Math.min(current + 10, duration), true);
+    }
+
+    // Update the progress bar.
+    function updateProgressBar() {
+      if (playerReady && player.getDuration) {
+        const duration = player.getDuration();
+        const current = player.getCurrentTime();
+        const percent = (current / duration) * 100;
+        document.getElementById('progressBar').value = percent || 0;
+      }
+    }
+
+    // Scrub through the video.
+    document.getElementById('progressBar').addEventListener('input', function() {
+      if (playerReady && player.getDuration) {
+        const duration = player.getDuration();
+        const newTime = (this.value / 100) * duration;
+        player.seekTo(newTime, true);
+      }
+    });
+
+    /* Recommended Videos and Search Functionality */
+
+    // Load recommended videos using the default query "music"
     async function loadRecommendedVideos() {
       try {
         const response = await fetch('/search', {
           method: 'POST',
-          headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
           body: 'query=' + encodeURIComponent('music')
         });
         const data = await response.json();
@@ -60,11 +221,10 @@
           console.error(data.error);
           return;
         }
-        // Shuffle and select 6 random videos
         const shuffled = data.sort(() => 0.5 - Math.random());
         const recommended = shuffled.slice(0, 6);
         const container = document.getElementById('homeContainer');
-        container.innerHTML = '';
+        container.innerHTML = "";
         recommended.forEach(video => {
           const box = document.createElement('div');
           box.className = 'home-box';
@@ -72,6 +232,8 @@
             <img src="${video.thumbnail}" alt="${video.title}">
             <div class="box-info">
               <h3>${video.title}</h3>
+              <button onclick="playSong('${video.videoId}', '${video.title}'); event.stopPropagation();">Play Now</button>
+              <button onclick="addToQueue('${video.videoId}', '${video.title}'); event.stopPropagation();">Add to Queue</button>
             </div>
           `;
           box.onclick = () => playSong(video.videoId, video.title);
@@ -82,40 +244,24 @@
       }
     }
 
-    // Play a video by injecting a YouTube iframe into the player area
-    function playSong(videoId, title) {
-      const embedUrl = `https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0&enablejsapi=1`;
-      document.getElementById('player').innerHTML = `
-        <iframe width="640" height="390" 
-                src="${embedUrl}" 
-                title="${title}" 
-                frameborder="0" 
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-                referrerpolicy="strict-origin-when-cross-origin"
-                allowfullscreen>
-        </iframe>
-      `;
-      document.getElementById('songTitle').textContent = title;
-    }
-
-    // Search for videos and display results
+    // Search for videos by user query.
     async function searchVideos() {
       const query = document.getElementById('searchInput').value.trim();
       if (!query) return;
       try {
         const response = await fetch('/search', {
           method: 'POST',
-          headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
           body: 'query=' + encodeURIComponent(query)
         });
         const data = await response.json();
-        document.getElementById('homeContainer').style.display = 'none';
+        document.getElementById('homeContainer').style.display = "none";
         const resultsContainer = document.getElementById('searchResults');
-        resultsContainer.style.display = 'flex';
-        resultsContainer.innerHTML = '';
+        resultsContainer.style.display = "flex";
+        resultsContainer.innerHTML = "";
         const backBtn = document.createElement('button');
         backBtn.id = 'backBtn';
-        backBtn.textContent = 'Back to Home';
+        backBtn.textContent = "Back to Home";
         backBtn.onclick = showHome;
         resultsContainer.appendChild(backBtn);
         data.forEach(video => {
@@ -124,6 +270,8 @@
           box.innerHTML = `
             <img src="${video.thumbnail}" alt="${video.title}">
             <h3>${video.title}</h3>
+            <button onclick="playSong('${video.videoId}', '${video.title}'); event.stopPropagation();">Play Now</button>
+            <button onclick="addToQueue('${video.videoId}', '${video.title}'); event.stopPropagation();">Add to Queue</button>
           `;
           box.onclick = () => playSong(video.videoId, video.title);
           resultsContainer.appendChild(box);
@@ -133,17 +281,17 @@
       }
     }
 
-    // Show the home view
+    // Show the home view.
     function showHome() {
-      document.getElementById('homeContainer').style.display = 'flex';
-      document.getElementById('searchResults').style.display = 'none';
-      document.getElementById('searchInput').value = '';
+      document.getElementById('homeContainer').style.display = "flex";
+      document.getElementById('searchResults').style.display = "none";
+      document.getElementById('searchInput').value = "";
     }
 
-    // Initialize recommended videos on load
+    // Initialize recommended videos on page load.
     loadRecommendedVideos();
 
-    // Dropdown menu functionality
+    // Dropdown menu functionality.
     document.addEventListener("DOMContentLoaded", function() {
       const dropdownToggle = document.querySelector('.dropdown-toggle');
       const dropdownMenu = document.querySelector('.dropdown-menu');
