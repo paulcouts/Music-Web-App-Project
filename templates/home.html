@@ -60,7 +60,7 @@
   <!-- Search results view (initially hidden) -->
   <div id="searchResults" style="display:none;"></div>
 
-  <!-- Hidden YouTube player (audio only) -->
+  <!-- YouTube player (positioned off-screen) -->
   <div id="hidden-video"></div>
 
   <!-- Bottom player bar -->
@@ -72,6 +72,7 @@
 
   <script>
     let player;
+    let playerReady = false;
     let isPlaying = false;
     let progressTimer = null;
 
@@ -92,7 +93,8 @@
           autoplay: 0,
           modestbranding: 1,
           showinfo: 0,
-          rel: 0
+          rel: 0,
+          playsinline: 1
         },
         events: {
           'onReady': onPlayerReady,
@@ -102,6 +104,7 @@
     };
 
     function onPlayerReady(event) {
+      playerReady = true;
       console.log("Player ready");
     }
 
@@ -131,16 +134,19 @@
     }
 
     function playSong(videoId, title) {
-      if (player && typeof player.loadVideoById === 'function') {
-        player.loadVideoById(videoId);
-        setTimeout(() => {
-          player.playVideo();
-        }, 500);
-        document.getElementById('songTitle').textContent = title;
-        document.getElementById('progressBar').value = 0;
-      } else {
-        console.log("Player not ready.");
+      if (!playerReady) {
+        console.log("Player is not ready yet.");
+        return;
       }
+      console.log("Loading video:", videoId);
+      // Load and play the selected video
+      player.loadVideoById(videoId);
+      // Optionally call playVideo after a short delay to ensure playback
+      setTimeout(() => {
+          player.playVideo();
+      }, 500);
+      document.getElementById('songTitle').textContent = title;
+      document.getElementById('progressBar').value = 0;
     }
 
     function togglePlayPause() {

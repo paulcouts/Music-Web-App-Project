@@ -110,13 +110,12 @@ h1 {
     z-index: 999;
 }
 
-/* Hidden YouTube Player */
+/* YouTube Player positioned off-screen */
 #hidden-video {
     position: absolute;
+    left: -9999px;
     width: 1px;
     height: 1px;
-    opacity: 0;
-    pointer-events: none;
 }
 
 /* Search Page Specific */
