@@ -1,10 +1,10 @@
-    <!DOCTYPE html>
+<!DOCTYPE html>
 <html>
 <head>
     <title>YouTube IFrame API Demo</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
-    <!-- 1. Div that will be replaced by the IFrame API -->
     <div id="player"></div>
 
     <script>
@@ -15,7 +15,7 @@
     
         var player;
         function onYouTubeIframeAPIReady() {
-            var videoId = '{{ video_id }}'; // Video ID passed from Flask
+            var videoId = '{{ video_id }}'; 
             player = new YT.Player('player', {
                 height: '390',
                 width: '640',

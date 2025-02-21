@@ -6,7 +6,6 @@ from googleapiclient.discovery import build
 app = Flask(__name__)
 CORS(app)
 
-# Get the YouTube API key from your .env file
 YOUTUBE_API_KEY = config('API_KEY')
 youtube = build('youtube', 'v3', developerKey=YOUTUBE_API_KEY)
 
@@ -20,12 +19,15 @@ def search():
     if not query:
         return jsonify({'error': 'No query provided'}), 400
 
-    search_response = youtube.search().list(
-        q=query,
-        part='snippet',
-        type='video',
-        maxResults=20,
-    ).execute()
+    try:
+        search_response = youtube.search().list(
+            q=query,
+            part='snippet',
+            type='video',
+            maxResults=20,
+        ).execute()
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
     music_keywords = ['music', 'song', 'track', 'album', 'official']
     results = []
@@ -43,9 +45,7 @@ def search():
         else:
             results.append(video)
 
-    # Combine prioritized results with the rest
     final_results = prioritized_results + results
-
     return jsonify(final_results)
 
 if __name__ == '__main__':
