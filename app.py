@@ -25,22 +25,23 @@ def search():
             part='snippet',
             type='video',
             maxResults=20,
+            videoEmbeddable='true'
         ).execute()
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
+    # Prioritize music-related videos.
     music_keywords = ['music', 'song', 'track', 'album', 'official']
     results = []
     prioritized_results = []
-
     for item in search_response.get('items', []):
         video = {
             'videoId': item['id']['videoId'],
             'title': item['snippet']['title'],
             'thumbnail': item['snippet']['thumbnails']['default']['url']
         }
-        title = item['snippet']['title'].lower()
-        if any(keyword in title for keyword in music_keywords):
+        title_lower = item['snippet']['title'].lower()
+        if any(keyword in title_lower for keyword in music_keywords):
             prioritized_results.append(video)
         else:
             results.append(video)

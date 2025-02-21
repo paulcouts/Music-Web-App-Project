@@ -3,168 +3,109 @@
 <head>
   <title>Music App</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <!-- Use Goudy Old Style Bold if installed on the system -->
+  <style>
+    body {
+      font-family: "Goudy Old Style Bold", "Goudy Old Style", serif;
+    }
+  </style>
 </head>
 <body>
-  <!-- Top navigation bar with search -->
-  <div class="top-nav">
-    <input type="text" id="searchInput" placeholder="Search songs or artists...">
-    <button onclick="searchVideos()">Search</button>
-  </div>
+  <!-- Top Navigation Bar -->
+  <header class="top-nav">
+    <div class="search-container">
+      <input type="text" id="searchInput" placeholder="Search songs or artists...">
+      <button onclick="searchVideos()">Search</button>
+    </div>
+    <div class="logo-container">
+      <div class="logo">MyMusic</div>
+      <div class="dropdown">
+        <button class="dropdown-toggle">Menu</button>
+        <ul class="dropdown-menu">
+          <li><a href="/">Home</a></li>
+          <li><a href="#">About</a></li>
+          <li><a href="#">Contact</a></li>
+        </ul>
+      </div>
+    </div>
+  </header>
 
-  <!-- Home view: Recommended videos -->
-  <div class="home-container" id="homeContainer">
-    <div class="home-box" onclick="playSong('dQw4w9WgXcQ', 'Never Gonna Give You Up')">
-      <img src="https://img.youtube.com/vi/dQw4w9WgXcQ/0.jpg" alt="Never Gonna Give You Up">
-      <div class="box-info">
-        <h3>Never Gonna Give You Up</h3>
-        <p>Rick Astley</p>
-      </div>
+  <!-- Player Area -->
+  <div id="playerContainer">
+    <div id="player">
+      <p>Select a video to play</p>
     </div>
-    <div class="home-box" onclick="playSong('FTQbiNvZqaY', 'Africa')">
-      <img src="https://img.youtube.com/vi/FTQbiNvZqaY/0.jpg" alt="Africa">
-      <div class="box-info">
-        <h3>Africa</h3>
-        <p>Toto</p>
-      </div>
-    </div>
-    <div class="home-box" onclick="playSong('djV11Xbc914', 'Take On Me')">
-      <img src="https://img.youtube.com/vi/djV11Xbc914/0.jpg" alt="Take On Me">
-      <div class="box-info">
-        <h3>Take On Me</h3>
-        <p>a-ha</p>
-      </div>
-    </div>
-    <div class="home-box" onclick="playSong('Zi_XLOBDo_Y', 'Billie Jean')">
-      <img src="https://img.youtube.com/vi/Zi_XLOBDo_Y/0.jpg" alt="Billie Jean">
-      <div class="box-info">
-        <h3>Billie Jean</h3>
-        <p>Michael Jackson</p>
-      </div>
-    </div>
-    <div class="home-box" onclick="playSong('JGwWNGJdvx8', 'Shape of You')">
-      <img src="https://img.youtube.com/vi/JGwWNGJdvx8/0.jpg" alt="Shape of You">
-      <div class="box-info">
-        <h3>Shape of You</h3>
-        <p>Ed Sheeran</p>
-      </div>
-    </div>
-    <div class="home-box" onclick="playSong('OPf0YbXqDm0', 'Uptown Funk')">
-      <img src="https://img.youtube.com/vi/OPf0YbXqDm0/0.jpg" alt="Uptown Funk">
-      <div class="box-info">
-        <h3>Uptown Funk</h3>
-        <p>Bruno Mars</p>
-      </div>
-    </div>
-  </div>
-
-  <!-- Search results view (initially hidden) -->
-  <div id="searchResults" style="display:none;"></div>
-
-  <!-- YouTube player (positioned off-screen) -->
-  <div id="hidden-video"></div>
-
-  <!-- Bottom player bar -->
-  <div class="player-bar">
     <div id="songTitle">Not playing</div>
-    <input type="range" id="progressBar" value="0" min="0" max="100" style="width: 40%;">
-    <button onclick="togglePlayPause()">Play/Pause</button>
   </div>
+
+  <!-- Home View: Recommended Videos -->
+  <div class="home-container" id="homeContainer">
+    <!-- Boxes injected dynamically -->
+  </div>
+
+  <!-- Search Results (initially hidden) -->
+  <div id="searchResults" style="display: none;"></div>
 
   <script>
-    let player;
-    let playerReady = false;
-    let isPlaying = false;
-    let progressTimer = null;
-
-    function loadYouTubeAPI() {
-      const tag = document.createElement('script');
-      tag.src = "https://www.youtube.com/iframe_api";
-      const firstScriptTag = document.getElementsByTagName('script')[0];
-      firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
-    }
-
-    window.onYouTubeIframeAPIReady = function() {
-      player = new YT.Player('hidden-video', {
-        height: '90',
-        width: '160',
-        videoId: '',
-        playerVars: {
-          controls: 1,
-          autoplay: 0,
-          modestbranding: 1,
-          showinfo: 0,
-          rel: 0,
-          playsinline: 1
-        },
-        events: {
-          'onReady': onPlayerReady,
-          'onStateChange': onPlayerStateChange
+    // Load recommended videos with the default query "music"
+    async function loadRecommendedVideos() {
+      try {
+        const response = await fetch('/search', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+          body: 'query=' + encodeURIComponent('music')
+        });
+        const data = await response.json();
+        if (data.error) {
+          console.error(data.error);
+          return;
         }
-      });
-    };
-
-    function onPlayerReady(event) {
-      playerReady = true;
-      console.log("Player ready");
-    }
-
-    function onPlayerStateChange(event) {
-      if (event.data === YT.PlayerState.PLAYING) {
-        isPlaying = true;
-        if (progressTimer) clearInterval(progressTimer);
-        progressTimer = setInterval(updateProgressBar, 1000);
-      } else {
-        isPlaying = false;
-        if (progressTimer) clearInterval(progressTimer);
-      }
-      if (event.data === YT.PlayerState.ENDED) {
-        document.getElementById('progressBar').value = 0;
-      }
-    }
-
-    function updateProgressBar() {
-      if (player && player.getCurrentTime && player.getDuration) {
-        const currentTime = player.getCurrentTime();
-        const duration = player.getDuration();
-        if (duration > 0) {
-          const progressPercent = (currentTime / duration) * 100;
-          document.getElementById('progressBar').value = progressPercent;
-        }
+        // Shuffle and select 6 random videos
+        const shuffled = data.sort(() => 0.5 - Math.random());
+        const recommended = shuffled.slice(0, 6);
+        const container = document.getElementById('homeContainer');
+        container.innerHTML = '';
+        recommended.forEach(video => {
+          const box = document.createElement('div');
+          box.className = 'home-box';
+          box.innerHTML = `
+            <img src="${video.thumbnail}" alt="${video.title}">
+            <div class="box-info">
+              <h3>${video.title}</h3>
+            </div>
+          `;
+          box.onclick = () => playSong(video.videoId, video.title);
+          container.appendChild(box);
+        });
+      } catch (err) {
+        console.error(err);
       }
     }
 
+    // Play a video by injecting a YouTube iframe into the player area
     function playSong(videoId, title) {
-      if (!playerReady) {
-        console.log("Player is not ready yet.");
-        return;
-      }
-      console.log("Loading video:", videoId);
-      // Load and play the selected video
-      player.loadVideoById(videoId);
-      // Optionally call playVideo after a short delay to ensure playback
-      setTimeout(() => {
-          player.playVideo();
-      }, 500);
+      const embedUrl = `https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0&enablejsapi=1`;
+      document.getElementById('player').innerHTML = `
+        <iframe width="640" height="390" 
+                src="${embedUrl}" 
+                title="${title}" 
+                frameborder="0" 
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                referrerpolicy="strict-origin-when-cross-origin"
+                allowfullscreen>
+        </iframe>
+      `;
       document.getElementById('songTitle').textContent = title;
-      document.getElementById('progressBar').value = 0;
     }
 
-    function togglePlayPause() {
-      if (!player) return;
-      if (isPlaying) {
-        player.pauseVideo();
-      } else {
-        player.playVideo();
-      }
-    }
-
+    // Search for videos and display results
     async function searchVideos() {
       const query = document.getElementById('searchInput').value.trim();
       if (!query) return;
       try {
         const response = await fetch('/search', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+          headers: {'Content-Type': 'application/x-www-form-urlencoded'},
           body: 'query=' + encodeURIComponent(query)
         });
         const data = await response.json();
@@ -179,11 +120,12 @@
         resultsContainer.appendChild(backBtn);
         data.forEach(video => {
           const box = document.createElement('div');
-          box.classList.add('search-box');
+          box.className = 'search-box';
           box.innerHTML = `
-            <img src="${video.thumbnail}" alt="${video.title}" onclick="playSong('${video.videoId}', '${video.title}')" />
+            <img src="${video.thumbnail}" alt="${video.title}">
             <h3>${video.title}</h3>
           `;
+          box.onclick = () => playSong(video.videoId, video.title);
           resultsContainer.appendChild(box);
         });
       } catch (err) {
@@ -191,15 +133,28 @@
       }
     }
 
+    // Show the home view
     function showHome() {
       document.getElementById('homeContainer').style.display = 'flex';
-      const resultsContainer = document.getElementById('searchResults');
-      resultsContainer.style.display = 'none';
-      resultsContainer.innerHTML = '';
+      document.getElementById('searchResults').style.display = 'none';
       document.getElementById('searchInput').value = '';
     }
 
-    loadYouTubeAPI();
+    // Initialize recommended videos on load
+    loadRecommendedVideos();
+
+    // Dropdown menu functionality
+    document.addEventListener("DOMContentLoaded", function() {
+      const dropdownToggle = document.querySelector('.dropdown-toggle');
+      const dropdownMenu = document.querySelector('.dropdown-menu');
+      dropdownToggle.addEventListener('click', function(e) {
+        e.stopPropagation();
+        dropdownMenu.classList.toggle('show');
+      });
+      document.addEventListener('click', function() {
+        dropdownMenu.classList.remove('show');
+      });
+    });
   </script>
 </body>
 </html>
