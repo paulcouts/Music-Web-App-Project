@@ -3,12 +3,7 @@
 <head>
   <title>Music App</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-  <!-- Use Goudy Old Style Bold if installed on the system -->
-  <style>
-    body {
-      font-family: "Goudy Old Style Bold", "Goudy Old Style", serif;
-    }
-  </style>
+  <!-- Note: Removed the inline body font so that Goudy is used only for the title via the .logo class -->
 </head>
 <body>
   <!-- Top Navigation Bar -->
@@ -18,6 +13,7 @@
       <button onclick="searchVideos()">Search</button>
     </div>
     <div class="logo-container">
+      <!-- The .logo element uses Goudy per style.css -->
       <div class="logo">MyMusic</div>
       <div class="dropdown">
         <button class="dropdown-toggle">Menu</button>
@@ -32,10 +28,26 @@
 
   <!-- Player Area -->
   <div id="playerContainer">
-    <div id="player">
-      <p>Select a video to play</p>
-    </div>
+    <div id="player"><!-- YouTube Player will be injected here --></div>
     <div id="songTitle">Not playing</div>
+
+    <!-- Playback Control Panel -->
+    <div id="control-panel">
+      <div id="progressContainer">
+        <input type="range" id="progressBar" value="0" min="0" max="100">
+      </div>
+      <div id="controls">
+        <button id="rewindBtn">⏪</button>
+        <button id="playBtn">Play</button>
+        <button id="pauseBtn">Pause</button>
+        <button id="fastForwardBtn">⏩</button>
+        <button id="nextBtn">Next</button>
+      </div>
+      <div id="queueDisplay">
+        <h3>Up Next</h3>
+        <ul id="queueList"></ul>
+      </div>
+    </div>
   </div>
 
   <!-- Home View: Recommended Videos -->
@@ -47,6 +59,124 @@
   <div id="searchResults" style="display: none;"></div>
 
   <script>
+    // Load YouTube IFrame API
+    var tag = document.createElement('script');
+    tag.src = "https://www.youtube.com/iframe_api";
+    var firstScriptTag = document.getElementsByTagName('script')[0];
+    firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+
+    var player;
+    var queue = [];
+    var currentVideoId = '';
+
+    function onYouTubeIframeAPIReady() {
+      player = new YT.Player('player', {
+        height: '270',  // Reduced viewport height
+        width: '480',   // Reduced viewport width
+        videoId: '',
+        playerVars: {
+          'autoplay': 0,
+          'controls': 0  // Hide YouTube’s default controls in favor of custom controls
+        },
+        events: {
+          'onReady': onPlayerReady,
+          'onStateChange': onPlayerStateChange
+        }
+      });
+    }
+
+    function onPlayerReady(event) {
+      updateProgressBar();
+      // Update progress bar every second
+      setInterval(updateProgressBar, 1000);
+    }
+
+    function onPlayerStateChange(event) {
+      if (event.data === YT.PlayerState.ENDED) {
+        playNextInQueue();
+      }
+    }
+
+    function updateProgressBar() {
+      if (player && player.getDuration) {
+        var duration = player.getDuration();
+        var currentTime = player.getCurrentTime();
+        var progress = (currentTime / duration) * 100;
+        document.getElementById('progressBar').value = progress || 0;
+      }
+    }
+
+    // Setup control event listeners once DOM is loaded
+    document.addEventListener("DOMContentLoaded", function() {
+      document.getElementById('playBtn').addEventListener('click', function() {
+        player.playVideo();
+      });
+      document.getElementById('pauseBtn').addEventListener('click', function() {
+        player.pauseVideo();
+      });
+      document.getElementById('rewindBtn').addEventListener('click', function() {
+        var newTime = player.getCurrentTime() - 10;
+        player.seekTo(newTime < 0 ? 0 : newTime, true);
+      });
+      document.getElementById('fastForwardBtn').addEventListener('click', function() {
+        var newTime = player.getCurrentTime() + 10;
+        player.seekTo(newTime, true);
+      });
+      document.getElementById('nextBtn').addEventListener('click', function() {
+        playNextInQueue();
+      });
+      document.getElementById('progressBar').addEventListener('input', function() {
+        var newTime = (this.value / 100) * player.getDuration();
+        player.seekTo(newTime, true);
+      });
+    });
+
+    // Queue and playback management:
+    // If a song is already playing, add the new one to the queue.
+    // Otherwise, load and play immediately.
+    function playSong(videoId, title) {
+      if (player && player.getPlayerState() === YT.PlayerState.PLAYING) {
+        queue.push({ videoId: videoId, title: title });
+        updateQueueDisplay();
+      } else {
+        loadVideo(videoId, title);
+      }
+    }
+
+    function loadVideo(videoId, title) {
+      currentVideoId = videoId;
+      player.loadVideoById(videoId);
+      document.getElementById('songTitle').textContent = title;
+    }
+
+    function playNextInQueue() {
+      if (queue.length > 0) {
+        var next = queue.shift();
+        loadVideo(next.videoId, next.title);
+        updateQueueDisplay();
+      } else {
+        document.getElementById('songTitle').textContent = "No more songs in queue";
+      }
+    }
+
+    function updateQueueDisplay() {
+      var queueList = document.getElementById('queueList');
+      queueList.innerHTML = "";
+      queue.forEach(function(item, index) {
+        var li = document.createElement('li');
+        li.textContent = item.title;
+        // Add a remove button for each queued song
+        var removeBtn = document.createElement('button');
+        removeBtn.textContent = "X";
+        removeBtn.addEventListener('click', function() {
+          queue.splice(index, 1);
+          updateQueueDisplay();
+        });
+        li.appendChild(removeBtn);
+        queueList.appendChild(li);
+      });
+    }
+
     // Load recommended videos with the default query "music"
     async function loadRecommendedVideos() {
       try {
@@ -80,22 +210,6 @@
       } catch (err) {
         console.error(err);
       }
-    }
-
-    // Play a video by injecting a YouTube iframe into the player area
-    function playSong(videoId, title) {
-      const embedUrl = `https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0&enablejsapi=1`;
-      document.getElementById('player').innerHTML = `
-        <iframe width="640" height="390" 
-                src="${embedUrl}" 
-                title="${title}" 
-                frameborder="0" 
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-                referrerpolicy="strict-origin-when-cross-origin"
-                allowfullscreen>
-        </iframe>
-      `;
-      document.getElementById('songTitle').textContent = title;
     }
 
     // Search for videos and display results

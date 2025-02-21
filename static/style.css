@@ -1,11 +1,31 @@
-/* Global Dark Theme with Goudy Old Style Bold */
-body {
+/* Dark Modern, Clean Website CSS with Dark Purple Accent */
+
+/* Reset & Base */
+* {
     margin: 0;
-    padding: 20px;
-    background-color: #1a1a1a;
-    font-family: "Goudy Old Style Bold", "Goudy Old Style", serif;
-    color: #fff;
-    text-align: center;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  
+  :root {
+    --accent-color: #8e44ad;
+    --accent-hover: #732d91;
+    --background-color: #121212;
+    --text-color: #e0e0e0;
+    --header-background: #1e1e1e;
+    --header-shadow: rgba(0, 0, 0, 0.5);
+    --card-background: #1e1e1e;
+    --card-shadow: rgba(0, 0, 0, 0.6);
+    --border-color: #333;
+    --transition-speed: 0.3s;
+  }
+  
+  /* Global Styles */
+  body {
+    font-family: 'Montserrat', sans-serif;
+    background-color: var(--background-color);
+    color: var(--text-color);
+    line-height: 1.6;
   }
   
   /* Top Navigation */
@@ -13,144 +33,228 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background-color: #2c2c2c;
-    padding: 10px 20px;
-    border-bottom: 1px solid #333;
+    background-color: var(--header-background);
+    padding: 1rem 2rem;
+    box-shadow: 0 2px 4px var(--header-shadow);
     position: sticky;
     top: 0;
-    z-index: 1000;
+    z-index: 100;
   }
   
+  /* Search Container */
   .search-container {
     display: flex;
     align-items: center;
   }
   
-  .top-nav input[type="text"] {
-    padding: 8px;
-    border: none;
-    border-radius: 4px;
-    font-size: 16px;
-    margin-right: 8px;
+  .search-container input[type="text"] {
+    padding: 0.5rem 1rem;
+    border: 1px solid var(--border-color);
+    border-radius: 30px;
+    font-size: 1rem;
+    outline: none;
+    transition: border var(--transition-speed);
+    background-color: var(--card-background);
+    color: var(--text-color);
   }
   
-  .top-nav button {
-    padding: 8px 16px;
-    background-color: #007aff;
+  .search-container input[type="text"]:focus {
+    border-color: var(--accent-color);
+  }
+  
+  .search-container button {
+    padding: 0.5rem 1rem;
+    margin-left: 0.5rem;
+    background-color: var(--accent-color);
     border: none;
-    border-radius: 4px;
+    border-radius: 30px;
     color: #fff;
-    font-size: 16px;
+    font-size: 1rem;
     cursor: pointer;
+    transition: background-color var(--transition-speed);
   }
   
-  .logo-container {
-    display: flex;
-    align-items: center;
+  .search-container button:hover {
+    background-color: var(--accent-hover);
   }
   
+  /* Logo */
   .logo {
-    font-size: 20px;
-    font-weight: bold;
-    margin-right: 10px;
+    font-size: 1.5rem;
+    font-weight: 700;
+    font-family: 'Goudy Old Style', serif;
+    color: var(--text-color);
   }
   
+  /* Dropdown Menu */
   .dropdown {
     position: relative;
   }
   
   .dropdown-toggle {
-    background-color: #007aff;
+    background-color: var(--accent-color);
     border: none;
-    border-radius: 4px;
+    border-radius: 30px;
     color: #fff;
-    padding: 8px 12px;
+    padding: 0.5rem 1rem;
     cursor: pointer;
-    font-size: 16px;
+    font-size: 1rem;
   }
   
   .dropdown-menu {
     position: absolute;
-    top: 100%;
+    top: 110%;
     right: 0;
-    background-color: #2c2c2c;
-    border: 1px solid #444;
-    border-radius: 4px;
-    display: none;
+    background-color: var(--header-background);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
     list-style: none;
-    padding: 0;
-    margin: 5px 0 0 0;
-    min-width: 150px;
+    padding: 0.5rem 0;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
+    display: none;
   }
   
   .dropdown-menu.show {
     display: block;
   }
   
-  .dropdown-menu li {
-    border-bottom: 1px solid #444;
-  }
-  
-  .dropdown-menu li:last-child {
-    border-bottom: none;
-  }
-  
   .dropdown-menu li a {
     display: block;
-    padding: 8px 12px;
-    color: #fff;
+    padding: 0.5rem 1rem;
+    color: var(--text-color);
     text-decoration: none;
-    font-size: 16px;
+    transition: background-color var(--transition-speed);
   }
   
   .dropdown-menu li a:hover {
-    background-color: #007aff;
+    background-color: var(--accent-color);
+    color: #fff;
   }
   
   /* Player Container */
   #playerContainer {
-    margin-top: 20px;
+    max-width: 800px;
+    margin: 2rem auto;
+    padding: 1rem;
+    background-color: var(--card-background);
+    border-radius: 8px;
+    box-shadow: 0 4px 8px var(--card-shadow);
+    text-align: center;
   }
   
+  /* Player */
   #player {
     margin: 0 auto;
-    border-radius: 12px;
+    border-radius: 8px;
     overflow: hidden;
-    box-shadow: 0 1px 5px rgba(0,0,0,0.15);
   }
   
   /* Song Title */
   #songTitle {
-    margin-top: 10px;
-    font-size: 18px;
-    font-weight: bold;
+    margin-top: 1rem;
+    font-size: 1.25rem;
+    font-weight: 600;
   }
   
-  /* Home & Search Containers */
+  /* Control Panel */
+  #control-panel {
+    margin-top: 1.5rem;
+    padding: 1rem;
+    background-color: var(--header-background);
+    border-radius: 8px;
+    box-shadow: 0 2px 4px var(--header-shadow);
+  }
+  
+  #progressContainer {
+    margin: 1rem 0;
+  }
+  
+  #progressBar {
+    width: 100%;
+    height: 8px;
+    border-radius: 4px;
+    appearance: none;
+    background: var(--border-color);
+    outline: none;
+  }
+  
+  #progressBar::-webkit-slider-thumb {
+    appearance: none;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: var(--accent-color);
+    cursor: pointer;
+  }
+  
+  /* Controls Buttons */
+  #controls button {
+    padding: 0.5rem 1rem;
+    margin: 0 0.25rem;
+    background-color: var(--accent-color);
+    border: none;
+    border-radius: 30px;
+    color: #fff;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color var(--transition-speed);
+  }
+  
+  #controls button:hover {
+    background-color: var(--accent-hover);
+  }
+  
+  /* Queue Display */
+  #queueDisplay {
+    margin-top: 1rem;
+    text-align: left;
+  }
+  
+  #queueDisplay h3 {
+    margin-bottom: 0.5rem;
+    font-size: 1.125rem;
+  }
+  
+  #queueList {
+    list-style: none;
+    padding: 0;
+  }
+  
+  #queueList li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: var(--card-background);
+    padding: 0.5rem 1rem;
+    margin-bottom: 0.5rem;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+  }
+  
+  /* Home and Search Boxes */
   .home-container, #searchResults {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
-    gap: 20px;
-    margin: 20px auto;
-    max-width: 1000px;
-    padding: 0 20px;
+    gap: 1.5rem;
+    max-width: 1200px;
+    margin: 2rem auto;
+    padding: 0 1rem;
   }
   
-  /* Video Boxes */
   .home-box, .search-box {
-    background-color: #2c2c2c;
-    width: 30%;
-    max-width: 200px;
-    border-radius: 10px;
+    background-color: var(--card-background);
+    border-radius: 8px;
+    box-shadow: 0 2px 4px var(--card-shadow);
     overflow: hidden;
-    text-align: center;
     cursor: pointer;
-    transition: transform 0.3s;
+    transition: transform var(--transition-speed), box-shadow var(--transition-speed);
+    width: 200px;
   }
   
   .home-box:hover, .search-box:hover {
-    transform: scale(1.05);
+    transform: translateY(-4px);
+    box-shadow: 0 4px 8px var(--card-shadow);
   }
   
   .home-box img, .search-box img {
@@ -159,28 +263,41 @@ body {
   }
   
   .box-info, .search-box h3 {
-    padding: 10px;
+    padding: 0.75rem;
+    font-size: 1rem;
+    font-weight: 500;
+    text-align: center;
+    color: var(--text-color);
   }
   
-  .box-info h3, .search-box h3 {
-    font-size: 16px;
-    margin: 5px 0;
-  }
-  
-  /* Bottom Player Bar */
-  .player-bar {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    background-color: #2c2c2c;
-    border-top: 1px solid #333;
-    height: 60px;
-    display: flex;
-    align-items: center;
-    justify-content: space-around;
-    padding: 0 10px;
+  /* Back Button */
+  #backBtn {
+    padding: 0.5rem 1rem;
+    margin: 1rem auto;
+    background-color: var(--accent-color);
+    border: none;
+    border-radius: 30px;
     color: #fff;
-    z-index: 999;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color var(--transition-speed);
+    display: block;
+  }
+  
+  #backBtn:hover {
+    background-color: var(--accent-hover);
+  }
+  
+  /* Responsive Design */
+  @media (max-width: 768px) {
+    .top-nav {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+    
+    .home-container, #searchResults {
+      flex-direction: column;
+      align-items: center;
+    }
   }
   

@@ -6,11 +6,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100..900&display=swap" rel="stylesheet">
-  <style>
-    body {
-      font-family: "Goudy Old Style Bold", "Goudy Old Style", serif;
-    }
-  </style>
+  <!-- Removed inline body font styling so that Goudy is not applied globally -->
   <script>
     async function searchVideos() {
       const query = document.getElementById('searchInput').value;
@@ -52,7 +48,7 @@
       const player = document.getElementById('player');
       if (player) {
         player.innerHTML = `
-          <iframe width="640" height="390" 
+          <iframe width="480" height="270" 
                   src="${embedUrl}" 
                   title="Video player" 
                   frameborder="0" 
@@ -68,7 +64,8 @@
   </script>
 </head>
 <body>
-  <h1>Search for Music</h1>
+  <!-- Use the logo class for the title so that Goudy is applied only here -->
+  <h1 class="logo">Search for Music</h1>
   <div class="search-container">
     <input type="text" id="searchInput" placeholder="Enter search term...">
     <button onclick="searchVideos()">Search</button>
